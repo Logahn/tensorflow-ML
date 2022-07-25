@@ -7,3 +7,42 @@ Original file is located at
     https://colab.research.google.com/drive/1jgj9bVRWCZuasy8rDH3fCJ7B2nQmqFcY
 """
 
+# Commented out IPython magic to ensure Python compatibility.
+!pip install -q sklearn
+
+# %tensorflow_version 2.x
+
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from IPython.display import clear_output
+from six.moves import urllib
+
+import tensorflow.compat.v2.feature_column as fc
+
+import tensorflow as tf
+
+dftrain = pd.read_csv('https://storage.googleapis.com/tf-datasets/titanic/train.csv')#training dataset
+dfeval = pd.read_csv('https://storage.googleapis.com/tf-datasets/titanic/eval.csv') #test dataset
+y_train = dftrain.pop('survived')
+y_eval = dfeval.pop('survived')
+
+"""conversion of categorical data(non numerical data) into numerical data"""
+
+CATEGORICAL_COLUMNS = ['sex', 'n_siblings_spouses', 'parch', 'class', 'deck', 'embark_town', 'alone']
+NUMERICAL_COLUMNS = ['age', 'fare']
+
+feature_columns = []
+
+for feature_name in CATEGORICAL_COLUMNS:
+  vocabulary = dftrain[feature_name].unique()  #obtains a list of all unique values from a given feature column
+  feature_columns.append(tf.feature_column.categorical_column_with_vocabulary_list(feature_name, vocabulary))
+
+for feature_name in NUMERICAL_COLUMNS:
+  feature_columns.append(tf.feature_column.numeric_column(feature_name,dtype=tf.float32))
+
+print(feature_columns)
+
+dftrain['class'].unique()
